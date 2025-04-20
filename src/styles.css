@@ -1,0 +1,111 @@
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  padding: 20px;
+}
+
+.header {
+  margin-bottom: 30px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+}
+
+.tab {
+  padding: 8px 16px;
+  background: #eee;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #007bff;
+  color: white;
+}
+
+.garage-view, .winners-view {
+  margin-top: 20px;
+}
+
+.car {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+}
+
+.car-track {
+  position: relative;
+  height: 50px;
+  margin-top: 10px;
+  border-bottom: 2px dashed #333;
+}
+
+.car-icon {
+  position: absolute;
+  left: 0;
+  font-size: 30px;
+  transition: transform 0.1s linear;
+}
+
+.finish-line {
+  position: absolute;
+  right: 0;
+  height: 100%;
+  width: 2px;
+  background: red;
+}
+
+.btn {
+  padding: 8px 16px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+.hidden {
+  display: none;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.garage-controls {
+  margin-bottom: 20px;
+}
+
+.create-car {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
