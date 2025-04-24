@@ -68,7 +68,16 @@ export class WinnersView {
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${index + 1}</td>
-        <td><div class="car-icon" style="color: ${winner.color || '#000'}">🚗</div></td>
+        <td><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" 
+             class="car-icon" style="color:${winner.color}">
+          <path d="M5,12 L55,12 C57,12 58,13 58,15 L58,20 C58,22 57,23 55,23 L5,23 C3,23 2,22 2,20 L2,15 C2,13 3,12 5,12 Z" 
+                fill="currentColor" stroke="#333" stroke-width="0.5"/>
+          <path d="M10,13 L20,13 L20,20 L10,20 Z" fill="#aad4f5" stroke="#333" stroke-width="0.3"/>
+          <path d="M40,13 L50,13 L50,20 L40,20 Z" fill="#aad4f5" stroke="#333" stroke-width="0.3"/>
+          <circle cx="15" cy="23" r="4" fill="#222" stroke="#111" stroke-width="0.5"/>
+          <circle cx="45" cy="23" r="4" fill="#222" stroke="#111" stroke-width="0.5"/>
+          <path d="M15,15 L45,15 L45,17 L15,17 Z" fill="#fff" opacity="0.8"/>
+        </svg></td>
         <td>${winner.id}</td>
         <td>${winner.wins}</td>
         <td>${winner.time.toFixed(2)}</td>

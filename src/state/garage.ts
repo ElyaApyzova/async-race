@@ -16,6 +16,7 @@ export class GarageState {
 
   async addCar(car: Omit<ICar, 'id'>): Promise<void> {
     await carService.createCar(car);
+    this._totalCount += 1;
     await this.loadCars();
   }
 
@@ -26,6 +27,7 @@ export class GarageState {
 
   async deleteCar(id: number): Promise<void> {
     await carService.deleteCar(id);
+    this._totalCount = Math.max(0, this._totalCount - 1);
     await this.loadCars();
   }
 

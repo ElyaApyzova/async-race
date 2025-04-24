@@ -40,26 +40,27 @@ body {
 
 .car-track {
   position: relative;
-  height: 50px;
-  margin-top: 10px;
-  border-bottom: 2px dashed #333;
+  height: 60px;
+  margin: 10px 0;
+  border-bottom: 2px dashed #666;
 }
 
 .car-icon {
   position: absolute;
   left: 0;
-  font-size: 30px;
-  transition: transform 0.1s linear;
+  width: 50px;
+  height: 25px;
+  transition: transform 0.05s linear;
+  transform: translateX(0);
 }
 
 .finish-line {
   position: absolute;
-  right: 0;
+  right: 10px;
   height: 100%;
   width: 2px;
   background: red;
 }
-
 .btn {
   padding: 8px 16px;
   margin-right: 5px;

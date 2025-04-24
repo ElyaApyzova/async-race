@@ -2,6 +2,7 @@ import { garageState } from '../../state/garage';
 import { Car } from '../components/Car';
 import { Pagination, IPaginationOptions } from '../components/Pagination';
 import { RaceController } from '../../RaceController';
+import { GARAGE_PAGE_SIZE } from '../../constants/constant';
 
 export class GarageView {
   private raceController: RaceController;
@@ -15,7 +16,7 @@ export class GarageView {
     this.raceController = new RaceController(this.cars);
     
     const paginationOptions: IPaginationOptions = {
-      itemsPerPage: 7,
+      itemsPerPage: GARAGE_PAGE_SIZE,
       currentPage: garageState.page,
       totalItems: garageState.totalCount,
       onPageChange: (page: number) => this.handlePageChange(page)
@@ -33,6 +34,10 @@ export class GarageView {
   }
 
   private updatePagination(): void {
+    const totalPages = Math.ceil(garageState.totalCount / GARAGE_PAGE_SIZE);
+    if (garageState.page > totalPages && totalPages > 0) {
+      garageState.page = totalPages;
+    }
     this.pagination.update({
       currentPage: garageState.page,
       totalItems: garageState.totalCount
@@ -73,15 +78,26 @@ export class GarageView {
   }
 
   private addEventListeners(): void {
+    // Race button
     this.element.querySelector('.race-btn')?.addEventListener('click', async () => {
       const raceBtn = this.element.querySelector('.race-btn') as HTMLButtonElement;
       const resetBtn = this.element.querySelector('.reset-btn') as HTMLButtonElement;
       
       raceBtn.disabled = true;
-      await this.raceController.startRace();
       resetBtn.disabled = false;
+      // Disable all individual car buttons during race
+    this.cars.forEach(car => {
+      const carElement = car.getElement();
+      const startBtn = carElement.querySelector('.start-btn') as HTMLButtonElement;
+      const stopBtn = carElement.querySelector('.stop-btn') as HTMLButtonElement;
+      if (startBtn) startBtn.disabled = true;
+      if (stopBtn) stopBtn.disabled = true;
     });
 
+    await this.raceController.startRace();
+    });
+
+    // Reset button
     this.element.querySelector('.reset-btn')?.addEventListener('click', async () => {
       const raceBtn = this.element.querySelector('.race-btn') as HTMLButtonElement;
       const resetBtn = this.element.querySelector('.reset-btn') as HTMLButtonElement;
@@ -89,14 +105,22 @@ export class GarageView {
       resetBtn.disabled = true;
       await this.raceController.resetRace();
       raceBtn.disabled = false;
+      // Re-enable all individual car buttons after reset
+    this.cars.forEach(car => {
+      const carElement = car.getElement();
+      const startBtn = carElement.querySelector('.start-btn') as HTMLButtonElement;
+      if (startBtn) startBtn.disabled = false;
+    });
     });
 
+    // Generate cars button
     this.element.querySelector('.generate-btn')?.addEventListener('click', async () => {
       await garageState.generateRandomCars(100);
       this.renderCars();
       this.updatePagination();
     });
 
+    // Create car button
     this.element.querySelector('.create-btn')?.addEventListener('click', async () => {
       const nameInput = this.element.querySelector('.car-name-input') as HTMLInputElement;
       const colorInput = this.element.querySelector('.car-color-input') as HTMLInputElement;
@@ -111,10 +135,28 @@ export class GarageView {
         this.updatePagination();
       }
     });
+
+    // NEW: Update car button
+    this.element.querySelector('.update-btn')?.addEventListener('click', async () => {
+      const nameInput = this.element.querySelector('.car-name-input') as HTMLInputElement;
+      const colorInput = this.element.querySelector('.car-color-input') as HTMLInputElement;
+      const updateBtn = this.element.querySelector('.update-btn') as HTMLButtonElement;
+      const selectedCar = garageState.selectedCar;
+
+      if (selectedCar && nameInput.value.trim()) {
+        await garageState.updateCar(selectedCar.id, {
+          name: nameInput.value.trim(),
+          color: colorInput.value
+        });
+        nameInput.value = '';
+        updateBtn.disabled = true;
+        this.renderCars();
+        this.updatePagination();
+      }
+    });
   }
 
   getElement(): HTMLElement {
     return this.element;
   }
 }
- 

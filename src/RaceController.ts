@@ -1,8 +1,7 @@
-// src/RaceController.ts
 import { Car } from './ui/components/Car';
-import { winnersState } from '@state/winner';
+import { winnersState } from './state/winner';
 import { Modal } from './ui/components/Modal';
-import { Winner } from 'types/interface';
+import { Winner } from './types/interface';
 
 export interface RaceResult {
   carId: number;
@@ -23,31 +22,35 @@ export class RaceController {
 
   public async startRace(): Promise<void> {
     if (this.isRaceInProgress) return;
-
     this.isRaceInProgress = true;
     this.raceResults = [];
 
     try {
-      const racePromises = this.cars.map(async (car) => {
-        const time = await car.startRace();
-        return {
-          carId: car.id,
-          time: time || 0,
-          success: time !== null,
-          carName: car.name,
-        };
-      });
+      // Start all cars simultaneously
+      const racePromises = this.cars.map(car => 
+        car.startRace()
+          .then(time => ({
+            carId: car.id,
+            time: time || 0,
+            success: time !== null,
+            carName: car.name
+          }))
+          .catch(() => ({
+            carId: car.id,
+            time: 0,
+            success: false,
+            carName: car.name
+          }))
+      );
 
       const results = await Promise.all(racePromises);
       this.raceResults = results;
 
       const winner = this.determineWinner();
       if (winner) {
+        this.modal.show(`Winner: ${winner.carName} (${(winner.time / 1000).toFixed(2)}s)`);
         await this.handleWinner(winner);
       }
-    } catch (error) {
-      console.error('Race error:', error);
-      this.modal.show('Race failed to complete');
     } finally {
       this.isRaceInProgress = false;
     }
@@ -57,11 +60,14 @@ export class RaceController {
     const successfulResults = this.raceResults.filter((r) => r.success);
     if (successfulResults.length === 0) return null;
 
-    return successfulResults.reduce((prev, current) => (prev.time < current.time ? prev : current));
+    return successfulResults.reduce((prev, current) => 
+      (prev.time < current.time ? prev : current)
+    );
   }
 
   private async handleWinner(winner: RaceResult): Promise<void> {
-    this.modal.show(`Winner: ${winner.carName} (${(winner.time / 1000).toFixed(2)}s)`);
+    const winnerTime = (winner.time / 1000).toFixed(2);
+    this.modal.show(`Winner: ${winner.carName} (${winnerTime}s)`);
 
     try {
       const existingWinner = await winnersState.getWinner(winner.carId);
@@ -78,7 +84,6 @@ export class RaceController {
       }
     } catch (error) {
       console.error('Failed to update winners:', error);
-      this.modal.show('Failed to save winner results');
     }
   }
 
@@ -89,9 +94,5 @@ export class RaceController {
 
   public getRaceResults(): RaceResult[] {
     return this.raceResults;
-  }
-
-  public getIsRaceInProgress(): boolean {
-    return this.isRaceInProgress;
   }
 }
